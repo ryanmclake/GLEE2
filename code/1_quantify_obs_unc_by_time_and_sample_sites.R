@@ -15,6 +15,7 @@ base <- read_csv("./data/organized_data_to_append/GLEE_data_with_GLCP_link.csv")
   mutate(tot_sampling_events = num_months_sampled * num_sites_sampled) %>%
   group_by(lat, lon) %>%
   mutate(waterbody_id = cur_group_id()) %>%
+  filter(any(length(waterbody_id)>1)) %>%
   ungroup() %>%
   mutate(temp_for_model_K = ifelse(is.na(mean_temp_k), effective_obs_wtemp_k, mean_temp_k))
 
@@ -23,24 +24,23 @@ base <- read_csv("./data/organized_data_to_append/GLEE_data_with_GLCP_link.csv")
 # Calcualte the standard error based on the sample number for ebullition and diffusion seperately
 
 f <- base %>%
-  select(waterbody_id, tot_sampling_events, ch4_ebu, ch4_diff)
+  select(waterbody_id,num_months_sampled, num_sites_sampled, tot_sampling_events, ch4_ebu, ch4_diff)
+
+length(unique(f$waterbody_id))
 
 summary(f)
 
 ebu_error <- list()
 
-sample_numbers_ebu <- f %>% select(tot_sampling_events, ch4_ebu) %>% na.omit(.)
-sample_numbers_ebu <-c(unique(sample_numbers_ebu$tot_sampling_events))
+sample_numbers_ebu <- f %>% select(tot_sampling_events,num_months_sampled,tot_sampling_events, ch4_ebu) %>% na.omit(.)
 
-  
-for(s in 1:length(sample_numbers_ebu)){
 
-  error <- f %>% select(waterbody_id, tot_sampling_events, ch4_ebu) %>% 
+  error <- f %>% select(waterbody_id, num_months_sampled, num_sites_sampled, tot_sampling_events, ch4_ebu) %>% 
     na.omit(.) %>%
-    group_by(waterbody_id, tot_sampling_events) %>%
-    mutate(sd = (sqrt(sum(abs(ch4_ebu - mean(ch4_ebu))^2))/tot_sampling_events)) %>%
-    mutate(total_samples = tot_sampling_events,
-           flux_type = "Ebullition")
+    group_by(waterbody_id) %>%
+    mutate(sd_time = (sqrt(sum(abs(ch4_ebu - mean(ch4_ebu))^2))/num_months_sampled),
+           sd_space = (sqrt(sum(abs(ch4_ebu - mean(ch4_ebu))^2))/num_sites_sampled),
+           sd_space_time = (sqrt(sum(abs(ch4_ebu - mean(ch4_ebu))^2))/tot_sampling_events))
   
   ebu_error[[s]] <- error
   
