@@ -9,7 +9,7 @@ diff_base_temp <- base %>% select(ch4_diff, temp_for_model_K, waterbody_id, mont
   mutate(temp_for_model_C = temp_for_model_K-273.15)
 
 # First-order Arhennius
-monthly_diff_FOA = nlsLM(ch4_ebu ~ A * exp(a * temp_for_model_C),
+monthly_diff_FOA = nlsLM(ch4_diff ~ A * exp(a * temp_for_model_C),
                         start = list(A = 0.023, a = 0.124),
                         data = diff_base_temp,
                         control = nls.lm.control(maxiter=1000))

@@ -38,17 +38,13 @@ for(s in 1:length(sample_numbers_ebu)){
     na.omit(.) %>%
     summarise(se = (sqrt(sum(abs((ch4_ebu - mean(ch4_ebu))^2))/sample_numbers_ebu[s]))/sqrt(sample_numbers_ebu[s])) %>%
     mutate(total_samples = sample_numbers_ebu[s],
-           flux_type = "ebullition")
+           flux_type = "Ebullition")
   
   ebu_error[[s]] <- error
   
 }
 
 ebu_error = do.call(rbind, ebu_error)
-
-max(ebu_error$sd)
-
-plot(ebu_error$total_samples, ebu_error$se)
 
 ebu_error2 <- ebu_error %>%
   na.omit(.) %>%
@@ -82,19 +78,15 @@ for(s in 1:length(sample_numbers_diff)){
   error <- f %>% select(tot_sampling_events, ch4_diff) %>% 
     filter(tot_sampling_events == sample_numbers_diff[s]) %>%
     na.omit(.) %>%
-    summarise(sd = (sqrt(sum((ch4_diff - mean(ch4_diff))^2)/sample_numbers_diff[s]))) %>%
+    summarise(se = (sqrt(sum(abs((ch4_diff - mean(ch4_diff))^2))/sample_numbers_diff[s]))/sqrt(sample_numbers_diff[s])) %>%
     mutate(total_samples = sample_numbers_diff[s],
-           flux_type = "diffusion")
+           flux_type = "Diffusion")
   
   diff_error[[s]] <- error
   
 }
 
 diff_error = do.call(rbind, diff_error)
-
-max(diff_error$sd)
-
-plot(diff_error$total_samples, diff_error$sd)
 
 diff_error2 <- diff_error %>%
   na.omit(.) %>%
@@ -110,14 +102,23 @@ diff_error2 <- diff_error %>%
          sample_size = ifelse(total_samples > 40,"h: 41-50", sample_size),
          sample_size = ifelse(total_samples > 50,"i: 51+", sample_size)) %>%
   group_by(sample_size, flux_type) %>%
-  summarize(sd = (median(sd)))
+  summarize(se = (median(se)))
 
 error_all <- rbind(ebu_error2, diff_error2)
 
-ggplot(error_all, aes(sample_size, sd))+
+ggplot(error_all, aes(sample_size, se))+
   geom_bar(stat = "identity")+
-  ylab("Standard Deviation")+
+  ylab("Standard Error")+
+  xlab("Number of Measurements on Waterbody")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
   facet_wrap(~flux_type, scales = "free")
+  
+
+
+
+
+
 
 
 

@@ -23,8 +23,8 @@ ebu_base_temp_area <- base %>% select(ch4_ebu, temp_for_model_K, waterbody_id, m
   na.omit(.)%>%
   mutate(temp_for_model_C = temp_for_model_K-273.15)
 
-monthly_ebu_SOA_area_threshold = nlsLM(ch4_ebu ~ A * exp(a * temp_for_model_C - b * surf_area_k^2),
-                        start = list(A = 0.12, a = 0.035, b = 0.0001),
+monthly_ebu_SOA_area_threshold = nlsLM(ch4_ebu ~ A * exp(a * temp_for_model_C) * (surf_area_k/k+surf_area_k),
+                        start = list(A = 0.12, a = 0.035, k = 100),
                         data = ebu_base_temp_area,
                         control = nls.lm.control(maxiter=1000))
 summary(monthly_ebu_SOA_area_threshold) # get MSE value
@@ -172,6 +172,24 @@ ggplot(ebu_base_site, aes(x = temp_for_model_C, y = ch4_ebu))+
 
 ### LAKE AREA MODELS ###
 
+write_csv(base2, "./data/GLEE_data_with_GLCP_HWSD_link.csv")
+
+base2 <- read_csv("./data/GLEE_data_with_GLCP_HWSD_link.csv")
+
+ebu_base_temp_soil <- base2 %>% select(ch4_ebu, temp_for_model_K, waterbody_id, month, T_OC) %>%
+  na.omit(.)%>%
+  mutate(temp_for_model_C = temp_for_model_K-273.15)
+
+
+monthly_ebu_SOA_soil_threshold = nlsLM(ch4_ebu ~ (A * exp(a * temp_for_model_C)) * (-exp(b * T_OC)),
+                                       start = list(A = 0.12, a = 0.035, b = 0.12),
+                                       data = ebu_base_temp_soil,
+                                       control = nls.lm.control(maxiter=1024))
+summary(monthly_ebu_SOA_soil_threshold) # get MSE value
+
+dat <- as.data.frame(cbind(ebu_base_temp_soil$ch4_ebu, predict(monthly_ebu_SOA_soil_threshold)))
+second_order_area_limiter_NSE <- NSE(dat$V2, dat$V1)
+
 ### LAKE AREA ALL DATA ###
 
 ebu_base_area <- base %>% select(ch4_ebu, waterbody_id, month, surf_area_k) %>%
@@ -203,10 +221,6 @@ ggplot(ebu_base_temp, aes(x = temp_for_model_C, y = ch4_ebu))+
   scale_color_viridis(discrete = T, option = "C")+
   coord_cartesian(ylim=c(0, 3000))+
   theme_classic()
-
-
-
-
 
 
 ### Lake and reservoir partition ###

@@ -43,19 +43,18 @@ ebu_base_temp <- base %>% select(ch4_ebu, temp_for_model_K, waterbody_type, wate
   na.omit(.) %>%
   filter(waterbody_type == "reservoir") %>%
   mutate(temp_for_model_C = temp_for_model_K-273.15) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events <= 10, 29.434313, NA)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 10, 8.903169, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 20, 1.914520, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 30, 1.131719, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 40, 1.123484, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 50, 1.101714, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 60, 1.154789, ebu_sd)) %>%
-  mutate(ebu_sd = ifelse(tot_sampling_events > 100, 1.151526, ebu_sd)) %>%
-  mutate(sd2 = 0.001)
+  mutate(ebu_sd = ifelse(tot_sampling_events < 5,388, NA),
+         ebu_sd = ifelse(tot_sampling_events >= 5,43.1, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 10,35.3, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 15,5.61, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 20,4.26, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 25,0.902, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 30,0.248, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 50,0.0426, ebu_sd)) 
 
 
 jags.data = list(Y = ebu_base_temp$ch4_ebu,
-                 tau.obs = 1/((ebu_base_temp$sd2)) ^ 2,
+                 tau.obs = 1/((ebu_base_temp$ebu_sd)) ^ 2,
                  N = nrow(ebu_base_temp),
                  temp = as.numeric(ebu_base_temp$temp_for_model_C))
 

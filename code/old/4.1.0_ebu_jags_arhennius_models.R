@@ -1,0 +1,236 @@
+
+
+ahrennius_ebu_model = ("arhennius_ebu_model.txt")
+jagsscript = cat("
+model {  
+   
+   #priors===================================================
+   
+   A ~ dnorm(0,1e-6)
+   a ~ dnorm(0,1e-6)
+   sd.pro ~ dunif(0, 1000)
+   
+   #end priors===============================================
+   
+   for(i in 1:N) {
+     
+      #process model=============================================
+     
+      tau.pro[i] <- 1/((sd.pro)*(sd.pro))
+      predX[i] <- A * (a^(temp[i]-20))
+      X[i] ~ dnorm(predX[i],tau.pro[i])
+     
+      #end of process model======================================
+     
+      #data model================================================
+     
+      Y[i] ~ dnorm(X[i], tau.obs[i]) # Observation variation
+            #end of data model=========================================
+   }
+  }", file = ahrennius_ebu_model)
+
+ebu_coefficients <- read_csv("./data/ebullition_coefficients.csv")
+
+
+################################
+
+### MONTHLY TIMESTEP ALL WB ###
+ebu_base_temp <- base %>% select(lat, lon, ch4_ebu, temp_for_model_K, waterbody_type, year, month, tot_sampling_events) %>%
+  na.omit(.) %>%
+  mutate(temp_for_model_C = temp_for_model_K-273.15) %>%
+  mutate(ebu_sd = ifelse(tot_sampling_events < 5,388, NA),
+         ebu_sd = ifelse(tot_sampling_events >= 5,43.1, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 10,35.3, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 15,5.61, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 20,4.26, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 25,0.902, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 30,0.248, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 50,0.0426, ebu_sd)) 
+
+
+jags.data = list(Y = ebu_base_temp$ch4_ebu,
+                 tau.obs = 1/((ebu_base_temp$ebu_sd)) ^ 2,
+                 N = nrow(ebu_base_temp),
+                 temp = as.numeric(ebu_base_temp$temp_for_model_C))
+
+nchain = 3
+chain_seeds <- c(200,800,1400)
+init <- list()
+for(i in 1:nchain){
+  init[[i]] <- list(sd.pro = runif(1, 0.01, 2),
+                    A = runif(1, 100,150),
+                    a = runif(1, 1, 3),
+                    .RNG.name = "base::Wichmann-Hill",
+                    .RNG.seed = chain_seeds[i])
+}
+
+j.model   <- jags.model(file = ahrennius_ebu_model,
+                        data = jags.data,
+                        inits = init,
+                        n.chains = 3)
+
+eval_ebu  <- coda.samples(model = j.model,
+                          variable.names = c("sd.pro","A","a"),
+                          n.iter = 200000, n.burnin = 20000, thin = 200)
+plot(eval_ebu)
+
+all_coefficients <- eval_ebu %>%
+  spread_draws(sd.pro, A, a) %>%
+  filter(.chain == 1)
+
+all_coefficients_DF <- all_coefficients %>%
+  summarise(mean_E20 = mean(A),
+            sd_E20 = sd(A),
+            upper_95_E20 = quantile(A, 0.95, na.rm = T),
+            lower_95_E20 = quantile(A, 0.05, na.rm = T),
+            mean_omega = mean(a),
+            sd_omega = sd(a),
+            upper_95_omega = quantile(a, 0.95, na.rm = T),
+            lower_95_omega = quantile(a, 0.05, na.rm = T),
+            mean_process = mean(sd.pro),
+            sd_process = sd(sd.pro),
+            upper_95_process = quantile(sd.pro, 0.95, na.rm = T),
+            lower_95_process = quantile(sd.pro, 0.05, na.rm = T))
+
+
+
+
+
+
+
+
+
+
+### MONTHLY TIMESTEP LAKES ###
+ebu_base_temp <- base %>% select(lat, lon, ch4_ebu, temp_for_model_K, waterbody_type, year, month, tot_sampling_events) %>%
+  filter(waterbody_type == "lake") %>%
+  na.omit(.) %>%
+  mutate(temp_for_model_C = temp_for_model_K-273.15) %>%
+  mutate(ebu_sd = ifelse(tot_sampling_events < 5,388, NA),
+         ebu_sd = ifelse(tot_sampling_events >= 5,43.1, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 10,35.3, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 15,5.61, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 20,4.26, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 25,0.902, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 30,0.248, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 50,0.0426, ebu_sd)) 
+
+
+jags.data = list(Y = ebu_base_temp$ch4_ebu,
+                 tau.obs = 1/((ebu_base_temp$ebu_sd)) ^ 2,
+                 N = nrow(ebu_base_temp),
+                 temp = as.numeric(ebu_base_temp$temp_for_model_C))
+
+nchain = 3
+chain_seeds <- c(200,800,1400)
+init <- list()
+for(i in 1:nchain){
+  init[[i]] <- list(sd.pro = runif(1, 1, 2),
+                    A = runif(1, mean(ebu_coefficients$E20), sd(ebu_coefficients$E20)),
+                    a = runif(1, mean(ebu_coefficients$omega), 3),
+                    .RNG.name = "base::Wichmann-Hill",
+                    .RNG.seed = chain_seeds[i])
+}
+
+j.model   <- jags.model(file = ahrennius_ebu_model,
+                        data = jags.data,
+                        inits = init,
+                        n.chains = 3)
+
+eval_ebu  <- coda.samples(model = j.model,
+                          variable.names = c("sd.pro","A","a"),
+                          n.iter = 200000, n.burnin = 20000, thin = 200)
+plot(eval_ebu)
+
+
+lake_coefficients <- eval_ebu %>%
+  spread_draws(sd.pro, A, a) %>%
+  filter(.chain == 1)
+
+lake_coefficients_DF <- lake_coefficients %>%
+  summarise(mean_E20 = mean(A),
+            sd_E20 = sd(A),
+            upper_95_E20 = quantile(A, 0.95, na.rm = T),
+            lower_95_E20 = quantile(A, 0.05, na.rm = T),
+            mean_omega = mean(a),
+            sd_omega = sd(a),
+            upper_95_omega = quantile(a, 0.95, na.rm = T),
+            lower_95_omega = quantile(a, 0.05, na.rm = T),
+            mean_process = mean(sd.pro),
+            sd_process = sd(sd.pro),
+            upper_95_process = quantile(sd.pro, 0.95, na.rm = T),
+            lower_95_process = quantile(sd.pro, 0.05, na.rm = T))
+
+
+
+
+
+
+
+
+
+
+
+### MONTHLY TIMESTEP RESERVOIRS ###
+ebu_base_temp <- base %>% select(lat, lon, ch4_ebu, temp_for_model_K, waterbody_type, year, month, tot_sampling_events) %>%
+  filter(waterbody_type == "reservoir") %>%
+  na.omit(.) %>%
+  mutate(temp_for_model_C = temp_for_model_K-273.15) %>%
+  mutate(ebu_sd = ifelse(tot_sampling_events < 5,388, NA),
+         ebu_sd = ifelse(tot_sampling_events >= 5,43.1, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 10,35.3, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 15,5.61, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 20,4.26, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 25,0.902, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 30,0.248, ebu_sd),
+         ebu_sd = ifelse(tot_sampling_events > 50,0.0426, ebu_sd)) 
+
+
+jags.data = list(Y = ebu_base_temp$ch4_ebu,
+                 tau.obs = 1/((ebu_base_temp$ebu_sd)) ^ 2,
+                 N = nrow(ebu_base_temp),
+                 temp = as.numeric(ebu_base_temp$temp_for_model_C))
+
+nchain = 3
+chain_seeds <- c(200,800,1400)
+init <- list()
+for(i in 1:nchain){
+  init[[i]] <- list(sd.pro = runif(1, 1, 2),
+                    A = runif(1, mean(ebu_coefficients$E20), sd(ebu_coefficients$E20)),
+                    a = runif(1, mean(ebu_coefficients$omega), 3),
+                    .RNG.name = "base::Wichmann-Hill",
+                    .RNG.seed = chain_seeds[i])
+}
+
+j.model   <- jags.model(file = ahrennius_ebu_model,
+                        data = jags.data,
+                        inits = init,
+                        n.chains = 3)
+
+eval_ebu  <- coda.samples(model = j.model,
+                          variable.names = c("sd.pro","A","a"),
+                          n.iter = 200000, n.burnin = 20000, thin = 200)
+plot(eval_ebu)
+
+
+res_coefficients <- eval_ebu %>%
+  spread_draws(sd.pro, A, a) %>%
+  filter(.chain == 1)
+
+res_coefficients_DF <- res_coefficients %>%
+  summarise(mean_E20 = mean(A),
+            sd_E20 = sd(A),
+            upper_95_E20 = quantile(A, 0.95, na.rm = T),
+            lower_95_E20 = quantile(A, 0.05, na.rm = T),
+            mean_omega = mean(a),
+            sd_omega = sd(a),
+            upper_95_omega = quantile(a, 0.95, na.rm = T),
+            lower_95_omega = quantile(a, 0.05, na.rm = T),
+            mean_process = mean(sd.pro),
+            sd_process = sd(sd.pro),
+            upper_95_process = quantile(sd.pro, 0.95, na.rm = T),
+            lower_95_process = quantile(sd.pro, 0.05, na.rm = T))
+
+
+coefficients_all <- rbind(all_coefficients_DF, lake_coefficients_DF, res_coefficients_DF)
+
