@@ -4,3 +4,6 @@
 .Ruserdata
 /data/
 /output/
+/data/countries/
+/glcp_countries/
+.DS_Store
