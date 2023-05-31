@@ -2,7 +2,15 @@
 .Rhistory
 .RData
 .Ruserdata
-/data/
+/data/glcp_countries/
+/data/countries/
+/data/HWSD_1247/
+/data/littoral_area/
+/data/organized_data_to_append/
+/data/raw_data_downloaded/
+/data/shapes/
+/data/GLCP/
+/data/raw_data_downloaded/
 /output/
 /data/countries/
 /glcp_countries/

@@ -23,7 +23,9 @@ base <- read_csv("./data/organized_data_to_append/GLEE_data_with_GLCP_link.csv")
 # Calcualte the standard error based on the sample number for ebullition and diffusion seperately
 
 f <- base %>%
-  select(tot_sampling_events, ch4_ebu, ch4_diff)
+  select(waterbody_id, tot_sampling_events, ch4_ebu, ch4_diff)
+
+summary(f)
 
 ebu_error <- list()
 
@@ -33,11 +35,11 @@ sample_numbers_ebu <-c(unique(sample_numbers_ebu$tot_sampling_events))
   
 for(s in 1:length(sample_numbers_ebu)){
 
-  error <- f %>% select(tot_sampling_events, ch4_ebu) %>% 
-    filter(tot_sampling_events == sample_numbers_ebu[s]) %>%
+  error <- f %>% select(waterbody_id, tot_sampling_events, ch4_ebu) %>% 
     na.omit(.) %>%
-    summarise(se = (sqrt(sum(abs((ch4_ebu - mean(ch4_ebu))^2))/sample_numbers_ebu[s]))/sqrt(sample_numbers_ebu[s])) %>%
-    mutate(total_samples = sample_numbers_ebu[s],
+    group_by(waterbody_id, tot_sampling_events) %>%
+    mutate(sd = (sqrt(sum(abs(ch4_ebu - mean(ch4_ebu))^2))/tot_sampling_events)) %>%
+    mutate(total_samples = tot_sampling_events,
            flux_type = "Ebullition")
   
   ebu_error[[s]] <- error

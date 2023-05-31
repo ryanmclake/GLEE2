@@ -3,10 +3,9 @@ model {
    
    #priors===================================================
    
-   A ~ dnorm(319.5,1/829.4559)
-   a ~ dnorm(1.110,1/0.128368)
-   sd.pro ~ dunif(0,100)
-   sd.obs ~ dgamma(1/sd_values,1/sd_values)
+   A ~ dnorm(728.1,1/829.4559^2)
+   a ~ dnorm(1.110,1/0.128368^2)
+   sd.pro ~ dunif(0, 1000)
    
    #end priors===============================================
    
@@ -15,7 +14,7 @@ model {
       #process model=============================================
      
       tau.pro[i] <- 1/((sd.pro)*(sd.pro))
-      predX[i] <- A * a ^ (temp[i] - 20)
+      predX[i] <- A * (a^(temp[i]-20))
       X[i] ~ dnorm(predX[i],tau.pro[i])
      
       #end of process model======================================
@@ -23,8 +22,6 @@ model {
       #data model================================================
      
       Y[i] ~ dnorm(X[i], tau.obs[i]) # Observation variation
-      tau.obs[i] <- 1/((sd.obs)*(sd.obs))
-
             #end of data model=========================================
    }
   }
