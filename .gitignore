@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
+.RData
 .Ruserdata
 /data/glcp_countries/
 /data/countries/
@@ -16,3 +17,4 @@
 /data/countries/
 /glcp_countries/
 .DS_Store
+.Rhistory
