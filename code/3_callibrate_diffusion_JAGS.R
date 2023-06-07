@@ -4,7 +4,7 @@ rm(list=ls())
 #Clean your memory
 gc()
 
-# Set seed for repeatability
+# Set seed for repeat measurements
 set.seed(3818)
 
 # install packages needed for the analysis
