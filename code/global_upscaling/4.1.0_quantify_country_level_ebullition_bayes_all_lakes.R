@@ -5,7 +5,7 @@ rm(list=ls())
 gc()
 
 # Set seed for repeat measurements
-set.seed(3818)
+set.seed(38)
 
 # =======================================================================
 #------------------------------------------------------------------------
@@ -26,18 +26,19 @@ Johnson_model_diffusion <- function(temp){
   return(est)
 }
 
-arrhenius_ebu_posterior_prediction <- function(E20, omega, temp, Q){
-  est = (E20 * omega ^ (temp-20)) + rnorm(1000, 0, sd = Q)
+arrhenius_ebu_posterior_prediction <- function(E20, omega, temp, Q, P){
+  est = (E20 * omega ^ (temp-P)) + rnorm(10, 0, sd = Q)
   return(est)
 }
 
 arrhenius_diff_posterior_prediction <- function(A, a, temp, Q){
-  est = (A*exp(a*(temp))) + rnorm(1000, 0, sd = Q)
+  est = (A*exp(a*(temp))) + rnorm(10, 0, sd = Q)
   return(est)
 }
 
 ebu_coefficients <- read_csv("./output/raw_ebullition_coefficients.csv")
 diff_coefficients <- read_csv("./output/raw_diffusion_coefficients.csv")
+P = rnorm(n=10, mean=20, sd=1)
 
 file <- "/Users/ryanmcclure/Documents/GLEE2.1/glcp_countries/United States of America.csv"
 
@@ -48,28 +49,39 @@ temp_data <- c(d$temp_for_model_C)
 
 parms <- ebu_coefficients %>%
   filter(waterbody_type == "lake") %>%
-  sample_n(., 100, replace=TRUE)
+  sample_n(., 10, replace=TRUE)
 
-predict_output <- list()
+prediction_output <- list()
 
 for(s in 1:length(temp_data)){
   
   prediction <- arrhenius_ebu_posterior_prediction(temp = temp_data[s],
                                                    E20 = parms$E20,
                                                    omega = parms$omega,
-                                                   Q = parms$sd.pro)
-  predict_output[[s]] <- prediction
+                                                   Q = parms$sd.pro,
+                                                   P = P)
+  prediction_output[[s]] <- prediction
+  
 }
 
-prediction_output = as.data.frame(do.call(rbind, predict_output))
+prediction_output = as.data.frame(do.call(rbind, prediction_output))
 
-prediction_output_long <- prediction_output %>% t(.) %>% reshape2::melt(.) %>%
+prediction_output <- prediction_output %>% t(.) %>% reshape2::melt(.) %>%
   group_by(Var2) %>%
   summarize(mean = mean(value),
             sd = sd(value),
             var = var(value))
 
-#calculate_emission <- function(country){
+d <- cbind(d,prediction_output)
+
+d <- d %>% mutate(mean=ifelse(mean <= 0, 1, mean)) %>%
+           mutate(sd_low = ifelse(mean-sd < 0,0,sd),
+           sd_low = ifelse(sd_low == 0, mean, sd_low))
+
+d <- d %>% mutate('date' = lubridate::make_date(year = X1, month = X2))
+  
+
+
 
 out_jags <- list()
 
