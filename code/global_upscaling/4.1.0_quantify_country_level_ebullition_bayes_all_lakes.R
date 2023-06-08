@@ -1,3 +1,12 @@
+# Clean your environment
+rm(list=ls())
+
+#Clean your memory
+gc()
+
+# Set seed for repeat measurements
+set.seed(3818)
+
 # =======================================================================
 #------------------------------------------------------------------------
 
@@ -7,39 +16,59 @@ library(tidyr, warn.conflicts = FALSE)
 library(vroom, warn.conflicts = FALSE)
 library(readr, warn.conflicts = FALSE)
 
-Aben_model_paper <- function(temp){
+Johnson_model_ebullition <- function(temp){
   est = 100 * 1.1 ^ (temp-20)
   return(est)
 }
 
-Aben_model_NMLS <- function(temp){
-  est = (rnorm(1,96.98125, sd = 17.46113) * (rnorm(1,1.17077, sd = 0.02826) ^ (temp-20))) + rnorm(1,0, sd = 120)
+Johnson_model_diffusion <- function(temp){
+  est = 0.023*exp(0.124*temp)
   return(est)
 }
 
-ebu_arhennius <- function(temp){
-  est = rnorm(1,98.44878, sd = 16.16218) * rnorm(1,1.145583, sd = 0.02777339) ^ (temp-20) + rnorm(1,0, sd = 198.1507)
+arrhenius_ebu_posterior_prediction <- function(E20, omega, temp, Q){
+  est = (E20 * omega ^ (temp-20)) + rnorm(1000, 0, sd = Q)
   return(est)
 }
 
-ebu_arhennius_FO_1_4 <- function(temp){
-  est = rnorm(1,95.89238, sd = 24.677516) * rnorm(1,1.175983, sd = 0.05976376) ^ (temp-20) + rnorm(1,0, sd = 224.1444660) + rnorm(1,0, sd = 56.98130)
+arrhenius_diff_posterior_prediction <- function(A, a, temp, Q){
+  est = (A*exp(a*(temp))) + rnorm(1000, 0, sd = Q)
   return(est)
 }
 
-ebu_arhennius_FO_50 <- function(temp){
-  est = rnorm(1,97.12485, sd = 8.341771) * rnorm(1,1.171232, sd = 0.01409348) ^ (temp-20) + rnorm(1,0, sd = 0.9928644) + rnorm(1,0, sd = 99.93237)
-  return(est)
-}
+ebu_coefficients <- read_csv("./output/raw_ebullition_coefficients.csv")
+diff_coefficients <- read_csv("./output/raw_diffusion_coefficients.csv")
 
-file2 <- "/Users/ryanmcclure/Documents/GLEE-v1.0/data/GLEE-upscale-countries/Germany.csv"
+file <- "/Users/ryanmcclure/Documents/GLEE2.1/glcp_countries/United States of America.csv"
 
-output <- "/central/groups/carnegie_poc/rmcclure/project-GLEE/global_ebullition_emission.csv"
-
-d <- vroom::vroom(paste0(file2), col_names = F) %>%
-  mutate(X9 = ifelse(is.na(X9),0,X9)) %>%
-  na.omit(.)
+d <- vroom::vroom(paste0(file), col_names = F) %>%
+  mutate(temp_for_model_C = X10-273.15)
   
+temp_data <- c(d$temp_for_model_C)
+
+parms <- ebu_coefficients %>%
+  filter(waterbody_type == "lake") %>%
+  sample_n(., 100, replace=TRUE)
+
+predict_output <- list()
+
+for(s in 1:length(temp_data)){
+  
+  prediction <- arrhenius_ebu_posterior_prediction(temp = temp_data[s],
+                                                   E20 = parms$E20,
+                                                   omega = parms$omega,
+                                                   Q = parms$sd.pro)
+  predict_output[[s]] <- prediction
+}
+
+prediction_output = as.data.frame(do.call(rbind, predict_output))
+
+prediction_output_long <- prediction_output %>% t(.) %>% reshape2::melt(.) %>%
+  group_by(Var2) %>%
+  summarize(mean = mean(value),
+            sd = sd(value),
+            var = var(value))
+
 #calculate_emission <- function(country){
 
 out_jags <- list()

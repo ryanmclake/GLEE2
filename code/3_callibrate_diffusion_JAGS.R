@@ -133,6 +133,8 @@ for(g in 1:length(lake_type)){
 
 
 out_raw_coefficients = as.data.frame(do.call(rbind, out_raw_coefficients))
+write_csv(out_raw_coefficients, "./output/raw_diffusion_coefficients.csv")
+
 out_agg_coefficients = as.data.frame(do.call(rbind, out_agg_coefficients))
 
 

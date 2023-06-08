@@ -34,6 +34,7 @@ model {
    E20 ~ dnorm(728.1,1/829.4559^2)
    omega ~ dnorm(1.136,1/0.128368^2)
    sd.pro ~ dunif(0,1000)
+   #sd.pro ~ dgamma(1,1)
    
    #end priors===============================================
    
@@ -140,6 +141,8 @@ for(g in 1:length(lake_type)){
 
 # output the raw and aggregated coefficients as a DF
 out_raw_coefficients = as.data.frame(do.call(rbind, out_raw_coefficients))
+write_csv(out_raw_coefficients, "./output/raw_ebullition_coefficients.csv")
+
 out_agg_coefficients = as.data.frame(do.call(rbind, out_agg_coefficients))
 
 # generate a posterior prediction function
