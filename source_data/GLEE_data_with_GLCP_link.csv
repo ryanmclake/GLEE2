@@ -3,7 +3,7 @@ lat,lon,waterbody_type,year,month,country,continent,primary_data_source,ch4_diff
 66.55,-164.45,lake,2009,7,United States of America,North America,Walter Anthony and Anthony 2013,NA,130,4,30,285.94,0.18,NA,NA,8120006560,0,0.007485491,529.6034897,285.1507538,170.981798
 61.06,-162.01,lake,1994,7,United States of America,North America,Dove et al 1999,43.992,NA,5,1,NA,4.1,NA,NA,8120267820,NA,NA,NA,NA,NA
 60.46,-161.45,lake,1988,7,United States of America,North America,Bartlett et al 1992,24.375,112,1,3,NA,0.0339,NA,NA,8120283150,NA,NA,NA,NA,NA
-71.13,-156.34,lake,NA,NA,United States of America,North America,Sturtevant et al 2013,38.23333333,NA,3,NA,NA,NA,NA,NA,8120357380,NA,NA,NA,NA,NA
+71.13,-156.34,lake,NA,NA,United States of America,North America,Sturtevant et al 2013,38.23333333,NA,3,NA,NA,3.3,NA,NA,8120357380,NA,NA,NA,NA,NA
 60.7,-151.32,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,NA,2.094,2,1,290.55,1.21,NA,NA,8120001800,9674.908702,0.00689168,3474.757276,285.1388902,185.1636765
 60.53,-150.84,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,18.848,NA,2,1,289.55,0.35,NA,NA,8090280400,13610.63555,0.006574818,5871.300676,284.3187085,182.7084322
 60.72,-150.81,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,NA,79.058,2,1,287.95,0.66,NA,NA,8120442250,5.319902108,0.006844159,1278.848835,285.1264548,187.2058053
@@ -43,12 +43,12 @@ lat,lon,waterbody_type,year,month,country,continent,primary_data_source,ch4_diff
 68.45,-149.37,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,18.269,72.115,2,1,287.45,0.1,NA,NA,8120104600,0,0.007238226,514.2250698,282.6191817,160.1421188
 68.38,-149.37,lake,1990,7,United States of America,North America,Kling et al 1992,7.5,NA,1,1,288.15,0.1,NA,NA,8120104600,NA,NA,NA,NA,NA
 68.38,-149.37,lake,2010,6,United States of America,North America,Walter Anthony et al 2010,NA,3.5,4,5,288.47,0.1,NA,NA,8120104600,0,0.006230788,310.2090605,280.9701136,201.8855658
-70.13,-149.28,lake,1990,8,United States of America,North America,Kling et al 1992,5,NA,1,1,288.15,NA,NA,NA,8120082140,NA,NA,NA,NA,NA
-70.13,-149.28,lake,2010,6,United States of America,North America,Walter Anthony et al 2010,NA,14.2,4,5,NA,NA,NA,NA,8120082140,25.44111364,0.004353893,414.018084,276.4500059,167.3058071
-70.13,-149.28,lake,2010,7,United States of America,North America,Walter Anthony et al 2010,NA,72.6,4,5,NA,NA,NA,NA,8120082140,25.44111364,0.005723641,1022.484004,280.287773,148.8954023
-68.67,-149.25,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,19.231,NA,2,1,284.85,NA,NA,NA,8120101430,0.60060145,0.007506557,1253.104588,283.6661966,158.2783116
-63.84,-149.04,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,37.692,16.154,2,1,285.15,NA,NA,NA,8120206980,375.6231726,0.006894035,875.1725841,283.6660777,181.7204802
-63.85,-148.97,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,17.692,11.538,2,1,288.45,NA,NA,NA,8120206980,375.6231726,0.006894035,875.1725841,283.6660777,181.7204802
+70.13,-149.28,lake,1990,8,United States of America,North America,Kling et al 1992,5,NA,1,1,288.15,0.24,NA,NA,8120082140,NA,NA,NA,NA,NA
+70.13,-149.28,lake,2010,6,United States of America,North America,Walter Anthony et al 2010,NA,14.2,4,5,NA,0.24,NA,NA,8120082140,25.44111364,0.004353893,414.018084,276.4500059,167.3058071
+70.13,-149.28,lake,2010,7,United States of America,North America,Walter Anthony et al 2010,NA,72.6,4,5,NA,0.24,NA,NA,8120082140,25.44111364,0.005723641,1022.484004,280.287773,148.8954023
+68.67,-149.25,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,19.231,NA,2,1,284.85,0.03,NA,NA,8120101430,0.60060145,0.007506557,1253.104588,283.6661966,158.2783116
+63.84,-149.04,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,37.692,16.154,2,1,285.15,0.47,NA,NA,8120206980,375.6231726,0.006894035,875.1725841,283.6660777,181.7204802
+63.85,-148.97,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,17.692,11.538,2,1,288.45,0.1,NA,NA,8120206980,375.6231726,0.006894035,875.1725841,283.6660777,181.7204802
 68.76,-148.84,lake,2012,7,United States of America,North America,Sepulveda-Jauregui et al 2015,30.769,28.846,2,1,291.55,NA,NA,NA,8120098990,1.023079924,0.007643391,923.3511724,284.2811118,157.8190325
 68,-148.75,lake,1987,7,United States of America,North America,Whalen and Reeburgh 1990,21,NA,2,1,NA,NA,NA,NA,8120104600,NA,NA,NA,NA,NA
 69.33,-148.75,lake,1987,8,United States of America,North America,Morrissey and Livingston 1991,3.1,NA,1,2,NA,NA,NA,NA,8120098990,NA,NA,NA,NA,NA

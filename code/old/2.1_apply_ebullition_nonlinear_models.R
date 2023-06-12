@@ -4,7 +4,7 @@ library(hydroGOF)
 ### TEMPERATURE MODELS ###
 
 ### MONTHLY TIMESTEP ###
-ebu_base_temp <- base %>% select(ch4_ebu, temp_for_model_K, waterbody_id, month) %>%
+ebu_base_temp <- filtered_lakes %>% select(ch4_ebu, temp_for_model_K, waterbody_id, month) %>%
   na.omit(.)%>%
   mutate(temp_for_model_C = temp_for_model_K-273.15)
 
@@ -189,6 +189,7 @@ summary(monthly_ebu_SOA_soil_threshold) # get MSE value
 
 dat <- as.data.frame(cbind(ebu_base_temp_soil$ch4_ebu, predict(monthly_ebu_SOA_soil_threshold)))
 second_order_area_limiter_NSE <- NSE(dat$V2, dat$V1)
+
 
 ### LAKE AREA ALL DATA ###
 
