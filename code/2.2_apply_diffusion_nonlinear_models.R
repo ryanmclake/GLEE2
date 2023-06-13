@@ -4,7 +4,7 @@ library(minpack.lm)
 ### TEMPERATURE MODELS ###
 
 ### MONTHLY TIMESTEP ###
-diff_base_temp <- base %>% select(ch4_diff, temp_for_model_K, waterbody_id, month) %>%
+diff_base_temp <- error_diff %>% select(ch4_diff, temp_for_model_K, waterbody_id) %>%
   na.omit(.)%>%
   mutate(temp_for_model_C = temp_for_model_K-273.15)
 
