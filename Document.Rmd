@@ -1,0 +1,21 @@
+---
+title: "Resolving uncertainty of measurements and models for global lake and reservoir methane emissions"
+output: html_notebook
+---
+
+This is a document to describe the impetus for resolving uncertainty in global lake and reservoir emissions. Our goal is to take a new approach to understanding global lake and reservoir CH4 emissions. Instead of emphasizing an approach that "improves" the estiamte, our aim is to unclude as much uncertainty as possible, get huge bounds of uncertainty, and then parse the uncertainty using sensitivity analyses to isolate where we need to improve the workflow. 
+
+
+
+
+
+```{r}
+# Hello world
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
