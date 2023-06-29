@@ -79,6 +79,9 @@ d <- d %>% mutate(mean=ifelse(mean <= 0, 1, mean)) %>%
            sd_low = ifelse(sd_low == 0, mean, sd_low))
 
 d <- d %>% mutate('date' = lubridate::make_date(year = X1, month = X2))
+
+ggplot(d, aes(date, mean, group = X3))+
+  geom_line(alpha = 0.01)
   
 
 
