@@ -1,7 +1,9 @@
+
 library(tidyverse)
 
 dat <- read_csv("./global_predictions.csv") %>%
   rename(`Variability Source` = group)
+
 
 summary(dat)
 
@@ -17,7 +19,10 @@ cols <- c("a: Past" = "black",
           "j: Model-high" = "grey40")
 
 
+
 p <- ggplot(dat, aes(x = area_weighted_flux, y = author, fill = `Variability Source`))+
+
+ggplot(dat, aes(x = area_weighted_flux, y = author, fill = group))+
   scale_y_discrete(limits=rev)+
   theme_classic() + 
   scale_colour_manual(values = cols)+
@@ -58,3 +63,8 @@ p <- ggplot(dat, aes(x = area_weighted_flux, y = author, fill = `Variability Sou
 p
 
 ggsave("./Global_rate_comparison.tiff", device = "tiff", dpi = 1000, width = 20, height = 16, units = "cm")
+  geom_errorbarh(aes(xmax = area_weighted_flux + upper_95, xmin = area_weighted_flux - lower_95, height = .2, color = group))+
+  geom_point(pch = 21, size = 6, color = "black")+
+  ylab("Emission Estaimte Source")+
+  xlab("Area Corrected Global Methane Flux (g CH4 m-2 yr-1)")
+  
