@@ -1,0 +1,14 @@
+author,area_weighted_flux,lower_95,upper_95,group
+"a: Bastviken et al., 2011",59.3,,,a: Past
+"b: DelSontro et al., 2018",66.7,,,a: Past
+"c: Rosentreter et al,. 2021",117,,,a: Past
+"d: Johnson et al., 2021/2022",48.3,,,a: Past
+e: Ours (Baseline),33.6161,13.6877,46.1171,b: Baseline
+f: Ours (Time),22.94076,10.01035,32.34175,c: Time-low
+f: Ours (Time),162.6627,69.459,224.498,d: Time-high
+g: Ours (Space),1.899455,0.745573,2.121777,e: Space-low
+g: Ours (Space),91.0399,36.7984,124.7762,f: Space-high
+h: Ours (Parameter),31.797,12.3335,43.3911,g: Parameter-low
+h: Ours (Parameter),216.0961,92.2143,298.304,h: Parameter-high
+i: Ours (Model),1.74665,0.08605,3.160924,i: Model-low
+i: Ours (Model),141.994,37.0897,129.8829,j: Model-high
